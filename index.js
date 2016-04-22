@@ -108,7 +108,7 @@ function isModifield(fieldName) {
  */
 
 function toSlug(str) {
-  	return removeDiacritics(a).toLowerCase().replace(/[^\w]/g, '-').replace(/-{2,}/g,'-');
+  	return removeDiacritics(str).toLowerCase().replace(/[^\w]/g, '-').replace(/-{2,}/g,'-');
 }
 
 /*
