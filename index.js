@@ -108,7 +108,7 @@ function isModifield(fieldName) {
  */
 
 function toSlug(str) {
-  return removeAccents(str).toLowerCase().replace(/[^\w]/g, '-');
+  	return removeDiacritics(a).toLowerCase().replace(/[^\w]/g, '-').replace(/-{2,}/g,'-');
 }
 
 /*
@@ -128,98 +128,61 @@ function sluggableString(fieldName) {
   }).join(" ").trim();
 }
 
-var removalMap = {
-	'A'  : /[AⒶＡÀÁÂẦẤẪẨÃĀĂẰẮẴẲȦǠÄǞẢÅǺǍȀȂẠẬẶḀĄ]/g,
-	'AA' : /[Ꜳ]/g,
-	'AE' : /[ÆǼǢ]/g,
-	'AO' : /[Ꜵ]/g,
-	'AU' : /[Ꜷ]/g,
-	'AV' : /[ꜸꜺ]/g,
-	'AY' : /[Ꜽ]/g,
-	'B'  : /[BⒷＢḂḄḆɃƂƁ]/g,
-	'C'  : /[CⒸＣĆĈĊČÇḈƇȻꜾ]/g,
-	'D'  : /[DⒹＤḊĎḌḐḒḎĐƋƊƉꝹ]/g,
-	'DZ' : /[ǱǄ]/g,
-	'Dz' : /[ǲǅ]/g,
-	'E'  : /[EⒺＥÈÉÊỀẾỄỂẼĒḔḖĔĖËẺĚȄȆẸỆȨḜĘḘḚƐƎ]/g,
-	'F'  : /[FⒻＦḞƑꝻ]/g,
-	'G'  : /[GⒼＧǴĜḠĞĠǦĢǤƓꞠꝽꝾ]/g,
-	'H'  : /[HⒽＨĤḢḦȞḤḨḪĦⱧⱵꞍ]/g,
-	'I'  : /[IⒾＩÌÍÎĨĪĬİÏḮỈǏȈȊỊĮḬƗ]/g,
-	'J'  : /[JⒿＪĴɈ]/g,
-	'K'  : /[KⓀＫḰǨḲĶḴƘⱩꝀꝂꝄꞢ]/g,
-	'L'  : /[LⓁＬĿĹĽḶḸĻḼḺŁȽⱢⱠꝈꝆꞀ]/g,
-	'LJ' : /[Ǉ]/g,
-	'Lj' : /[ǈ]/g,
-	'M'  : /[MⓂＭḾṀṂⱮƜ]/g,
-	'N'  : /[NⓃＮǸŃÑṄŇṆŅṊṈȠƝꞐꞤ]/g,
-	'NJ' : /[Ǌ]/g,
-	'Nj' : /[ǋ]/g,
-	'O'  : /[OⓄＯÒÓÔỒỐỖỔÕṌȬṎŌṐṒŎȮȰÖȪỎŐǑȌȎƠỜỚỠỞỢỌỘǪǬØǾƆƟꝊꝌ]/g,
-	'OI' : /[Ƣ]/g,
-	'OO' : /[Ꝏ]/g,
-	'OU' : /[Ȣ]/g,
-	'P'  : /[PⓅＰṔṖƤⱣꝐꝒꝔ]/g,
-	'Q'  : /[QⓆＱꝖꝘɊ]/g,
-	'R'  : /[RⓇＲŔṘŘȐȒṚṜŖṞɌⱤꝚꞦꞂ]/g,
-	'S'  : /[SⓈＳẞŚṤŜṠŠṦṢṨȘŞⱾꞨꞄ]/g,
-	'T'  : /[TⓉＴṪŤṬȚŢṰṮŦƬƮȾꞆ]/g,
-	'TZ' : /[Ꜩ]/g,
-	'U'  : /[UⓊＵÙÚÛŨṸŪṺŬÜǛǗǕǙỦŮŰǓȔȖƯỪỨỮỬỰỤṲŲṶṴɄ]/g,
-	'V'  : /[VⓋＶṼṾƲꝞɅ]/g,
-	'VY' : /[Ꝡ]/g,
-	'W'  : /[WⓌＷẀẂŴẆẄẈⱲ]/g,
-	'X'  : /[XⓍＸẊẌ]/g,
-	'Y'  : /[YⓎＹỲÝŶỸȲẎŸỶỴƳɎỾ]/g,
-	'Z'  : /[ZⓏＺŹẐŻŽẒẔƵȤⱿⱫꝢ]/g,
-	'a'  : /[aⓐａẚàáâầấẫẩãāăằắẵẳȧǡäǟảåǻǎȁȃạậặḁąⱥɐ]/g,
-	'aa' : /[ꜳ]/g,
-	'ae' : /[æǽǣ]/g,
-	'ao' : /[ꜵ]/g,
-	'au' : /[ꜷ]/g,
-	'av' : /[ꜹꜻ]/g,
-	'ay' : /[ꜽ]/g,
-	'b'  : /[bⓑｂḃḅḇƀƃɓ]/g,
-	'c'  : /[cⓒｃćĉċčçḉƈȼꜿↄ]/g,
-	'd'  : /[dⓓｄḋďḍḑḓḏđƌɖɗꝺ]/g,
-	'dz' : /[ǳǆ]/g,
-	'e'  : /[eⓔｅèéêềếễểẽēḕḗĕėëẻěȅȇẹệȩḝęḙḛɇɛǝ]/g,
-	'f'  : /[fⓕｆḟƒꝼ]/g,
-	'g'  : /[gⓖｇǵĝḡğġǧģǥɠꞡᵹꝿ]/g,
-	'h'  : /[hⓗｈĥḣḧȟḥḩḫẖħⱨⱶɥ]/g,
-	'hv' : /[ƕ]/g,
-	'i'  : /[iⓘｉìíîĩīĭïḯỉǐȉȋịįḭɨı]/g,
-	'j'  : /[jⓙｊĵǰɉ]/g,
-	'k'  : /[kⓚｋḱǩḳķḵƙⱪꝁꝃꝅꞣ]/g,
-	'l'  : /[lⓛｌŀĺľḷḹļḽḻſłƚɫⱡꝉꞁꝇ]/g,
-	'lj' : /[ǉ]/g,
-	'm'  : /[mⓜｍḿṁṃɱɯ]/g,
-	'n'  : /[nⓝｎǹńñṅňṇņṋṉƞɲŉꞑꞥ]/g,
-	'nj' : /[ǌ]/g,
-	'o'  : /[oⓞｏòóôồốỗổõṍȭṏōṑṓŏȯȱöȫỏőǒȍȏơờớỡởợọộǫǭøǿɔꝋꝍɵ]/g,
-	'oi' : /[ƣ]/g,
-	'ou' : /[ȣ]/g,
-	'oo' : /[ꝏ]/g,
-	'p'  : /[pⓟｐṕṗƥᵽꝑꝓꝕ]/g,
-	'q'  : /[qⓠｑɋꝗꝙ]/g,
-	'r'  : /[rⓡｒŕṙřȑȓṛṝŗṟɍɽꝛꞧꞃ]/g,
-	's'  : /[sⓢｓßśṥŝṡšṧṣṩșşȿꞩꞅẛ]/g,
-	't'  : /[tⓣｔṫẗťṭțţṱṯŧƭʈⱦꞇ]/g,
-	'tz' : /[ꜩ]/g,
-	'u'  : /[uⓤｕùúûũṹūṻŭüǜǘǖǚủůűǔȕȗưừứữửựụṳųṷṵʉ]/g,
-	'v'  : /[vⓥｖṽṿʋꝟʌ]/g,
-	'vy' : /[ꝡ]/g,
-	'w'  : /[wⓦｗẁẃŵẇẅẘẉⱳ]/g,
-	'x'  : /[xⓧｘẋẍ]/g,
-	'y'  : /[yⓨｙỳýŷỹȳẏÿỷẙỵƴɏỿ]/g,
-	'z'  : /[zⓩｚźẑżžẓẕƶȥɀⱬꝣ]/g,
-};
-
-function removeAccents(str) {
-    for(var latin in removalMap) {
-      var nonLatin = removalMap[latin];
-      str = str.replace(nonLatin , latin);
-    }
-
-    return str;
+function removeDiacritics (str) {
+	var conversions = new Object();
+	conversions['ae'] = 'ä|æ|ǽ';
+	conversions['oe'] = 'ö|œ';
+	conversions['ue'] = 'ü';
+	conversions['Ae'] = 'Ä';
+	conversions['Ue'] = 'Ü';
+	conversions['Oe'] = 'Ö';
+	conversions['A'] = 'À|Á|Â|Ã|Ä|Å|Ǻ|Ā|Ă|Ą|Ǎ';
+	conversions['a'] = 'à|á|â|ã|å|ǻ|ā|ă|ą|ǎ|ª';
+	conversions['C'] = 'Ç|Ć|Ĉ|Ċ|Č';
+	conversions['c'] = 'ç|ć|ĉ|ċ|č';
+	conversions['D'] = 'Ð|Ď|Đ';
+	conversions['d'] = 'ð|ď|đ';
+	conversions['E'] = 'È|É|Ê|Ë|Ē|Ĕ|Ė|Ę|Ě';
+	conversions['e'] = 'è|é|ê|ë|ē|ĕ|ė|ę|ě';
+	conversions['G'] = 'Ĝ|Ğ|Ġ|Ģ';
+	conversions['g'] = 'ĝ|ğ|ġ|ģ';
+	conversions['H'] = 'Ĥ|Ħ';
+	conversions['h'] = 'ĥ|ħ';
+	conversions['I'] = 'Ì|Í|Î|Ï|Ĩ|Ī|Ĭ|Ǐ|Į|İ';
+	conversions['i'] = 'ì|í|î|ï|ĩ|ī|ĭ|ǐ|į|ı';
+	conversions['J'] = 'Ĵ';
+	conversions['j'] = 'ĵ';
+	conversions['K'] = 'Ķ';
+	conversions['k'] = 'ķ';
+	conversions['L'] = 'Ĺ|Ļ|Ľ|Ŀ|Ł';
+	conversions['l'] = 'ĺ|ļ|ľ|ŀ|ł';
+	conversions['N'] = 'Ñ|Ń|Ņ|Ň';
+	conversions['n'] = 'ñ|ń|ņ|ň|ŉ';
+	conversions['O'] = 'Ò|Ó|Ô|Õ|Ō|Ŏ|Ǒ|Ő|Ơ|Ø|Ǿ';
+	conversions['o'] = 'ò|ó|ô|õ|ō|ŏ|ǒ|ő|ơ|ø|ǿ|º';
+	conversions['R'] = 'Ŕ|Ŗ|Ř';
+	conversions['r'] = 'ŕ|ŗ|ř';
+	conversions['S'] = 'Ś|Ŝ|Ş|Š';
+	conversions['s'] = 'ś|ŝ|ş|š|ſ';
+	conversions['T'] = 'Ţ|Ť|Ŧ';
+	conversions['t'] = 'ţ|ť|ŧ';
+	conversions['U'] = 'Ù|Ú|Û|Ũ|Ū|Ŭ|Ů|Ű|Ų|Ư|Ǔ|Ǖ|Ǘ|Ǚ|Ǜ';
+	conversions['u'] = 'ù|ú|û|ũ|ū|ŭ|ů|ű|ų|ư|ǔ|ǖ|ǘ|ǚ|ǜ';
+	conversions['Y'] = 'Ý|Ÿ|Ŷ';
+	conversions['y'] = 'ý|ÿ|ŷ';
+	conversions['W'] = 'Ŵ';
+	conversions['w'] = 'ŵ';
+	conversions['Z'] = 'Ź|Ż|Ž';
+	conversions['z'] = 'ź|ż|ž';
+	conversions['AE'] = 'Æ|Ǽ';
+	conversions['ss'] = 'ß';
+	conversions['IJ'] = 'Ĳ';
+	conversions['ij'] = 'ĳ';
+	conversions['OE'] = 'Œ';
+	conversions['f'] = 'ƒ';
+	for(var i in conversions){
+		var re = new RegExp(conversions[i],"g");
+		str = str.replace(re,i);
+	}
+	return str;
 }
